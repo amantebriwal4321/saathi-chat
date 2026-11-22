@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --ink: #241812;
+  --paper: #f3eadc;
+  --card: #fffaf3;
+  --saffron: #e07a2f;
+  --saffron-deep: #c45e12;
+  --leaf: #1c7a4a;
+  --help: #c2352b;
+  --lagoon: #1d4e5f;
+  --line: #eadcc8;
+  --muted: #6d5c4e;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(900px 480px at 100% -10%, rgba(224, 122, 47, 0.28), transparent 55%),
+    radial-gradient(720px 420px at -15% 10%, rgba(29, 78, 95, 0.14), transparent 50%),
+    var(--paper);
+  font-family: "Nunito", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Bengali", "Nirmala UI", sans-serif;
+}
+
+.font-display { font-family: "Fraunces", Georgia, serif; }
+
+button, a, input, select, textarea { font: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--lagoon);
+  outline-offset: 3px;
+}
+
+.pulse-help {
+  animation: pulse-help 1.6s ease-out infinite;
+}
+
+@keyframes pulse-help {
+  0% { box-shadow: 0 0 0 0 rgba(194, 53, 43, 0.45); }
+  100% { box-shadow: 0 0 0 14px rgba(194, 53, 43, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-help { animation: none; }
+}
+
+.safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
