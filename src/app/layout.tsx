@@ -22,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href={fontHref} rel="stylesheet" />
+        <meta name="saathi-rev" content="2" />
       </head>
       <body>{children}</body>
     </html>

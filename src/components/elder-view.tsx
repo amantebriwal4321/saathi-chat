@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LANGUAGES, languageLabel, type LanguageCode } from "@/lib/languages";
 import { formatWhen } from "@/lib/format";
 import type { Profile } from "@/lib/profile";
@@ -40,7 +40,7 @@ export function ElderView({
   const [listening, setListening] = useState(false);
   const [draft, setDraft] = useState("");
   const [notice, setNotice] = useState("");
-  const [typing, setTyping] = useState(false);
+  const [typing, setTyping] = useState(true);
   const [typed, setTyped] = useState("");
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -108,13 +108,22 @@ export function ElderView({
   function play(item: ChatItem) {
     unlockSpeech();
     const line = lineFor(item, translations[item.id], profile.language);
-    if (line) speak(line, profile.language);
+    if (!line) return;
+    setNotice(copy.listening);
+    speak(line, profile.language);
+    window.setTimeout(() => setNotice(""), 2500);
   }
 
-  const visible = [...messages].reverse();
+  const visible = messages;
+
+  useEffect(() => {
+    const node = listRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  }, [messages, translations]);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-4">
+    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col px-4 pt-4">
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#c45e12]">Saathi</p>
@@ -127,7 +136,7 @@ export function ElderView({
       {error ? <p className="mt-4 rounded-3xl bg-[#fff4e6] px-4 py-3 text-lg leading-7 text-[#5c3b22]">{error}</p> : null}
       {notice ? <p className="mt-3 rounded-3xl bg-[#fde8e4] px-4 py-3 text-lg leading-7">{notice}</p> : null}
 
-      <div ref={listRef} className="mt-4 flex flex-1 flex-col-reverse gap-3 overflow-y-auto pb-4" aria-live="polite">
+      <div ref={listRef} className="mt-4 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-4" aria-live="polite">
         {visible.length === 0 ? (
           <p className="rounded-3xl bg-white/70 px-4 py-6 text-2xl leading-snug text-[#6d5c4e]">
             {copy.messages}

@@ -2,6 +2,10 @@
 
 Nexconn App Key: y745wfm8ynerv
 
+Live app: https://saathi-elder-chat.vercel.app
+
+Repository: https://github.com/amantebriwal4321/saathi-chat
+
 ## Why we built it
 
 A lot of families in India are split across cities, and the person at home is often the one least served by a normal chat app. The phone is there. The text is small. The keyboard is in the wrong script. One wrong tap and you are in a group you did not mean to join. Saathi is the companion in that room: one big button, the language they already speak, and a family on the other side who can actually read it.

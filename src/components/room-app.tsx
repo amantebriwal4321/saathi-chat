@@ -50,12 +50,10 @@ function RoomSession({
   const directMessages = room.messages.filter((item) => item.channel === "direct" && item.peerId === room.directPeer);
 
   return (
-    <main>
-      <div className="mx-auto flex max-w-3xl justify-end px-4 pt-3">
-        <button type="button" onClick={onLeave} className="text-sm font-bold text-[#6d5c4e] underline">
-          Switch person
-        </button>
-      </div>
+    <main className="relative">
+      <button type="button" onClick={onLeave} className="absolute right-4 top-3 z-10 text-sm font-bold text-[#6d5c4e] underline">
+        Switch person
+      </button>
       {profile.role === "elder" ? (
         <ElderView
           profile={profile}

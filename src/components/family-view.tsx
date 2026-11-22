@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { LANGUAGE_CODES, LANGUAGES, languageLabel, type LanguageCode } from "@/lib/languages";
 import { formatWhen } from "@/lib/format";
 import type { Profile } from "@/lib/profile";
@@ -46,7 +46,17 @@ export function FamilyView({
   const [notice, setNotice] = useState("");
   const [recording, setRecording] = useState(false);
   const help = checkins.filter((item) => item.status === "help");
+  const checkedIn = checkins.filter((item) => item.sentTime > 0);
+  const shownCheckins = checkedIn.length ? checkedIn.slice(0, 6) : checkins.slice(0, 3);
   const peer = members.find((person) => person.userId === directPeer);
+  const listRef = useRef<HTMLDivElement>(null);
+  const recentPeople = recentSpeakers(messages, members, profile.userId);
+
+  useEffect(() => {
+    const node = listRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  }, [messages, translations]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -91,7 +101,7 @@ export function FamilyView({
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col px-4 py-4">
+    <div className="mx-auto flex h-dvh w-full max-w-3xl flex-col px-4 py-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="font-display text-3xl font-semibold">Saathi family</p>
@@ -129,7 +139,7 @@ export function FamilyView({
       <section className="mt-4">
         <h2 className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#6d5c4e]">Daily check-in</h2>
         <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-          {checkins.length === 0 ? <p className="text-sm text-[#6d5c4e]">No elder check-in yet.</p> : checkins.map((item) => (
+          {shownCheckins.length === 0 ? <p className="text-sm text-[#6d5c4e]">No elder check-in yet.</p> : shownCheckins.map((item) => (
             <article key={item.senderUserId} className={`min-w-44 rounded-2xl px-3 py-3 ${item.status === "help" ? "bg-[#fde8e4]" : item.sentTime ? "bg-[#e5f6ec]" : "bg-white"}`}>
               <p className="font-extrabold">{item.displayName}</p>
               <p className="text-sm">{item.status === "help" ? "Needs help" : item.status === "ok" ? "Okay today" : "No check-in yet"}</p>
@@ -143,7 +153,7 @@ export function FamilyView({
         <button type="button" onClick={onShowRoom} className={`min-h-11 rounded-full px-4 text-sm font-extrabold ${directPeer ? "bg-white" : "bg-[#241812] text-white"}`}>
           Family room
         </button>
-        {members.filter((person) => person.userId !== profile.userId).map((person) => (
+        {recentPeople.map((person) => (
           <button key={person.userId} type="button" onClick={() => onOpenDirect(person.userId)} className={`min-h-11 rounded-full px-4 text-sm font-extrabold ${directPeer === person.userId ? "bg-[#1d4e5f] text-white" : "bg-white"}`}>
             {person.name}
           </button>
@@ -159,7 +169,7 @@ export function FamilyView({
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-1 flex-col gap-3 overflow-y-auto">
+      <div ref={listRef} className="mt-3 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
         {messages.length === 0 ? (
           <p className="rounded-3xl bg-white/80 px-4 py-8 text-center text-[#6d5c4e]">The room is quiet. Say hello.</p>
         ) : messages.map((item) => {
@@ -205,4 +215,18 @@ export function FamilyView({
       </form>
     </div>
   );
+}
+
+function recentSpeakers(messages: ChatItem[], members: Person[], me: string) {
+  const ids: string[] = [];
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const id = messages[index].senderUserId;
+    if (id === me || ids.includes(id)) continue;
+    ids.push(id);
+    if (ids.length === 5) break;
+  }
+  return ids.map((id) => {
+    const known = members.find((person) => person.userId === id);
+    return known || { userId: id, name: messages.find((item) => item.senderUserId === id)?.displayName || id };
+  });
 }
